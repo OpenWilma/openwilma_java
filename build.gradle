@@ -1,0 +1,17 @@
+plugins {
+    id 'java'
+}
+
+group 'org.openwilma.java'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation("com.squareup.okhttp3:okhttp:4.8.1")
+    implementation 'org.json:json:20200518'
+}
