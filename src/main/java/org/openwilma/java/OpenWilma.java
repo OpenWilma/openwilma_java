@@ -17,12 +17,12 @@ import org.openwilma.java.client.WilmaHttpClient;
 import org.openwilma.java.config.Config;
 import org.openwilma.java.listeners.WilmaLoginListener;
 import org.openwilma.java.listeners.WilmaServersListener;
+import org.openwilma.java.utils.SessionUtils;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 public class OpenWilma {
 

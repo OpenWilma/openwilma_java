@@ -1,4 +1,4 @@
-package org.openwilma.java;
+package org.openwilma.java.utils;
 
 import org.openwilma.java.config.Config;
 
