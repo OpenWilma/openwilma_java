@@ -12,7 +12,7 @@ public class LoginTest {
 
     @Test
     public void testLogin() {
-        OpenWilma.login(new WilmaServer("https://test.inschool.fi"), "test", "test", new WilmaLoginListener() {
+        OpenWilma.login(new WilmaServer("https://test.inschool.fi"), "mobile.testaccount@visma.local", "MobiiliTestausTiliAutomaatille", new WilmaLoginListener() {
             @Override
             public void onLogin(String wilmaSession) {
                 System.out.println("Login successful");

@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class OpenWilma {
 
@@ -76,7 +77,7 @@ public class OpenWilma {
         sessionHttpClient.getRequest(buildUrl(wilmaServer, "index_json"), new WilmaHttpClient.HttpClientInterface() {
             @Override
             public void onResponse(String response, int status) {
-                String session = null;
+                String session;
 
                 if (isJSONValid(response)) {
                     SessionResponse sessionResponse = new Gson().fromJson(response, SessionResponse.class);
@@ -128,15 +129,37 @@ public class OpenWilma {
                             }
                             if (response.headers().names().contains("Location")) {
                                 String locationValue = response.headers().get("Location");
+                                if (locationValue == null) {
+                                    listener.onFailed(new Error("No redirect header", ErrorType.InvalidContent));
+                                    return;
+                                }
                                 try {
                                     URL url = new URL(locationValue);
-                                    if (url.getPath().equals("/")) {
+                                    if (url.getPath().equals("/") || url.getPath().contains("/!")) {
                                         if (url.getQuery().contains("loginfailed")) {
                                             listener.onFailed(new CredentialsError());
                                         } else if (url.getQuery().contains("checkcookie")) {
-                                            // TODO get session cookies
+                                            if (response.headers().names().contains("Set-Cookie")) {
+                                                String sessionId = null;
+                                                List<String> sessionHeaders = response.headers("Set-Cookie");
+                                                for (String cookie : sessionHeaders) {
+                                                    if (cookie.contains("Wilma2SID=")) {
+                                                        sessionId = SessionUtils.parseSessionCookie(cookie);
+                                                        break;
+                                                    }
+                                                }
+                                                if (sessionId != null)
+                                                    listener.onLogin(sessionId);
+                                                else
+                                                    listener.onFailed(new Error("Unable to parse session cookie", ErrorType.InvalidContent));
+                                            } else
+                                                listener.onFailed(new Error("Session cookies missing", ErrorType.NoContent));
                                         }
-                                    }
+                                    } else if (url.getPath().equals("/mfa")) {
+                                        // MFA enabled, error
+                                        listener.onFailed(new MFAError());
+                                    } else
+                                        listener.onFailed(new Error("Invalid redirection: "+url.getPath(), ErrorType.Unknown));
                                 } catch (Exception e) {
                                     listener.onFailed(new ExceptionError(e));
                                 }
