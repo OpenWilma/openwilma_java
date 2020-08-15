@@ -7,4 +7,16 @@ public class JSONErrorResponse {
 
     @SerializedName("error")
     private WilmaError wilmaError;
+
+    public JSONErrorResponse(WilmaError wilmaError) {
+        this.wilmaError = wilmaError;
+    }
+
+    public WilmaError getWilmaError() {
+        return wilmaError;
+    }
+
+    public void setWilmaError(WilmaError wilmaError) {
+        this.wilmaError = wilmaError;
+    }
 }

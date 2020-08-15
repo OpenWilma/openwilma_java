@@ -3,9 +3,11 @@ package org.openwilma.java.classes.errors;
 public enum ErrorType {
     Unknown(-1),
     NetworkError(0),
-    NoContent(1),
-    InvalidContent(2),
-    WilmaError(3);
+    InvalidContent(1),
+    WilmaError(2),
+    NoContent(3),
+    LoginError(4);
+
 
     private int errorCode;
 

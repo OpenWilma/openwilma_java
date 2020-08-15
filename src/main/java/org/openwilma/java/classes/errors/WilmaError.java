@@ -18,6 +18,11 @@ public class WilmaError extends Error {
         this.whatsnext = whatsnext;
     }
 
+    @Override
+    public ErrorType getErrorType() {
+        return ErrorType.WilmaError;
+    }
+
     public String getErrorID() {
         return errorID;
     }

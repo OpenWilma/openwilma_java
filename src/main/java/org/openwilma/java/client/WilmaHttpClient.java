@@ -17,8 +17,13 @@ public class WilmaHttpClient {
         this.client = new OkHttpClient().newBuilder().callTimeout(60, TimeUnit.SECONDS).build();
     }
 
+    public WilmaHttpClient(boolean followRedirects) {
+        this.client = new OkHttpClient().newBuilder().followRedirects(followRedirects).followSslRedirects(followRedirects).callTimeout(60, TimeUnit.SECONDS).build();
+    }
+
     public interface HttpClientInterface {
         void onResponse(String response, int status);
+        void onRawResponse(Response response);
         void onFailed(Error error);
     }
 
@@ -43,4 +48,58 @@ public class WilmaHttpClient {
             httpClientInterface.onFailed(new NetworkError(e));
         }
     }
+
+    public void getRawRequest(String url, HttpClientInterface httpClientInterface) {
+        Request.Builder requestBuilder = new Request.Builder();
+        requestBuilder.url(url);
+
+        // Making the request
+        Request getRequest = requestBuilder.build();
+        try {
+            Response response = this.client.newCall(getRequest).execute();
+            httpClientInterface.onRawResponse(response);
+        } catch (IOException e) {
+            httpClientInterface.onFailed(new NetworkError(e));
+        }
+    }
+
+    public void postRequest(String url, RequestBody requestBody, HttpClientInterface httpClientInterface) {
+        Request.Builder requestBuilder = new Request.Builder();
+        requestBuilder
+                .post(requestBody)
+                .url(url);
+
+        // Making the request
+        Request getRequest = requestBuilder.build();
+        try {
+            Response response = this.client.newCall(getRequest).execute();
+            ResponseBody body = response.body();
+            if (body != null) {
+                String content = body.string();
+                httpClientInterface.onResponse(content, response.code());
+            } else {
+                httpClientInterface.onFailed(new Error("No content in response", ErrorType.NoContent));
+            }
+        } catch (IOException e) {
+            httpClientInterface.onFailed(new NetworkError(e));
+        }
+    }
+
+    public void postRawRequest(String url, RequestBody requestBody, HttpClientInterface httpClientInterface) {
+        Request.Builder requestBuilder = new Request.Builder();
+        requestBuilder
+                .post(requestBody)
+                .url(url);
+
+        // Making the request
+        Request getRequest = requestBuilder.build();
+        try {
+            Response response = this.client.newCall(getRequest).execute();
+            httpClientInterface.onRawResponse(response);
+        } catch (IOException e) {
+            httpClientInterface.onFailed(new NetworkError(e));
+        }
+    }
+
+
 }
