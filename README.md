@@ -6,7 +6,7 @@ Java Library for OpenWilma
 To-Do list:
 * [x] Fetch Wilma servers
 * [x] Login
-* [ ] Roles
+* [x] Roles
 * [ ] Schedule
 
 
