@@ -14,4 +14,5 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation("com.squareup.okhttp3:okhttp:4.8.1")
     implementation 'org.json:json:20200518'
+    implementation 'org.jsoup:jsoup:1.13.1'
 }

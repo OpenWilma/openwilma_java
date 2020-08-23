@@ -8,6 +8,8 @@ import okhttp3.ResponseBody;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.openwilma.java.classes.Authentication;
+import org.openwilma.java.classes.Role;
 import org.openwilma.java.classes.WilmaServer;
 import org.openwilma.java.classes.errors.*;
 import org.openwilma.java.classes.errors.Error;
@@ -16,10 +18,14 @@ import org.openwilma.java.classes.responses.SessionResponse;
 import org.openwilma.java.client.WilmaHttpClient;
 import org.openwilma.java.config.Config;
 import org.openwilma.java.listeners.WilmaLoginListener;
+import org.openwilma.java.listeners.WilmaRolesListener;
 import org.openwilma.java.listeners.WilmaServersListener;
+import org.openwilma.java.parser.RoleParser;
 import org.openwilma.java.utils.SessionUtils;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,6 +73,28 @@ public class OpenWilma {
         else
             serverUrl = serverUrl + "/" + path;
         return serverUrl;
+    }
+
+    private static String buildUrlWithJsonFormat(WilmaServer wilmaServer, String path) {
+        String serverUrl = wilmaServer.getServerURL();
+        if (serverUrl.endsWith("/"))
+            serverUrl = serverUrl + path;
+        else
+            serverUrl = serverUrl + "/" + path;
+        try {
+            URI oldUri = new URI(serverUrl);
+            String newQuery = oldUri.getQuery();
+            if (newQuery == null) {
+                newQuery = Config.jsonQuery;
+            } else {
+                newQuery += "&" + Config.jsonQuery;
+            }
+            URI patchedUri = new URI(oldUri.getScheme(), oldUri.getAuthority(),
+                    oldUri.getPath(), newQuery, oldUri.getFragment());
+            return patchedUri.toString();
+        } catch (Exception ignored) {
+            return serverUrl;
+        }
     }
 
     public static void login(WilmaServer wilmaServer, String username, String password, WilmaLoginListener listener) {
@@ -149,7 +177,7 @@ public class OpenWilma {
                                                     }
                                                 }
                                                 if (sessionId != null)
-                                                    listener.onLogin(sessionId);
+                                                    listener.onLogin(new Authentication(wilmaServer, sessionId));
                                                 else
                                                     listener.onFailed(new Error("Unable to parse session cookie", ErrorType.InvalidContent));
                                             } else
@@ -180,7 +208,7 @@ public class OpenWilma {
 
             @Override
             public void onRawResponse(Response response) {
-
+               // not used
             }
 
             @Override
@@ -189,6 +217,51 @@ public class OpenWilma {
             }
         });
 
+
+    }
+
+    public static void roles(Authentication authentication, WilmaRolesListener listener) {
+        WilmaHttpClient sessionHttpClient = new WilmaHttpClient(authentication);
+        sessionHttpClient.getRawRequest(buildUrlWithJsonFormat(authentication.getWilmaServer(), ""), new WilmaHttpClient.HttpClientInterface() {
+            @Override
+            public void onResponse(String response, int status) {
+
+            }
+
+            @Override
+            public void onRawResponse(Response response) {
+                try {
+                    ResponseBody body = response.body();
+                    if (body != null) {
+                        String content = body.string();
+                        if (isJSONValid(content)) {
+                            // If valid json, error must be occurred
+                            try {
+                                JSONErrorResponse errorResponse = new Gson().fromJson(content, JSONErrorResponse.class);
+                                if (errorResponse != null && errorResponse.getWilmaError() != null) {
+                                    listener.onFailed(errorResponse.getWilmaError());
+                                }
+                            } catch (JSONException e) {
+                                listener.onFailed(new ExceptionError(e));
+                            }
+                        } else {
+                            // Proceed to parsing
+                            List<Role> roles = RoleParser.parseRoles(content);
+                            listener.onFetchRoles(roles);
+                        }
+                    } else
+                        listener.onFailed(new Error("Cannot load response", ErrorType.NoContent));
+
+                } catch (IOException e) {
+                    listener.onFailed(new NetworkError(e));
+                }
+            }
+
+            @Override
+            public void onFailed(Error error) {
+
+            }
+        });
 
     }
 

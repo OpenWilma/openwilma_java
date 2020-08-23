@@ -1,5 +1,6 @@
 import org.junit.Test;
 import org.openwilma.java.OpenWilma;
+import org.openwilma.java.classes.Authentication;
 import org.openwilma.java.classes.WilmaServer;
 import org.openwilma.java.classes.errors.Error;
 import org.openwilma.java.listeners.WilmaLoginListener;
@@ -14,9 +15,9 @@ public class LoginTest {
     public void testLogin() {
         OpenWilma.login(new WilmaServer("https://test.inschool.fi"), "mobile.testaccount@visma.local", "MobiiliTestausTiliAutomaatille", new WilmaLoginListener() {
             @Override
-            public void onLogin(String wilmaSession) {
+            public void onLogin(Authentication wilmaSession) {
                 System.out.println("Login successful");
-                System.out.println("SessionId: "+wilmaSession);
+                System.out.println("SessionId: "+wilmaSession.getSessionId());
             }
 
             @Override

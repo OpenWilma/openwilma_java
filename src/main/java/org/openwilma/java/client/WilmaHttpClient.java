@@ -2,9 +2,11 @@ package org.openwilma.java.client;
 
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
+import org.openwilma.java.classes.Authentication;
 import org.openwilma.java.classes.errors.Error;
 import org.openwilma.java.classes.errors.ErrorType;
 import org.openwilma.java.classes.errors.NetworkError;
+import org.openwilma.java.utils.WilmaCookieJar;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -15,6 +17,10 @@ public class WilmaHttpClient {
 
     public WilmaHttpClient() {
         this.client = new OkHttpClient().newBuilder().callTimeout(60, TimeUnit.SECONDS).build();
+    }
+
+    public WilmaHttpClient(Authentication authentication) {
+        this.client = new OkHttpClient().newBuilder().cookieJar(WilmaCookieJar.getWilmaCookieJar(authentication)).callTimeout(60, TimeUnit.SECONDS).build();
     }
 
     public WilmaHttpClient(boolean followRedirects) {
