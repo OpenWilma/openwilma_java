@@ -20,7 +20,7 @@ public class RolesTest {
 
     @Test
     public void testRoles() {
-        OpenWilma.login(new WilmaServer("https://test.inschool.fi"), "mobile.testaccount@visma.local", "MobiiliTestausTiliAutomaatille", new WilmaLoginListener() {
+        OpenWilma.login(new WilmaServer("url"), "username", "password", new WilmaLoginListener() {
             @Override
             public void onLogin(Authentication wilmaSession) {
                 System.out.println("Login successful");
