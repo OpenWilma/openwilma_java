@@ -30,7 +30,6 @@ public class RolesTest {
                     @Override
                     public void onFetchRoles(List<Role> roles) {
                         System.out.println("Fetched roles!");
-                        System.out.println("");
                         for (Role role : roles) {
                             System.out.println(new Gson().toJson(role));
                             System.out.println("----------");
