@@ -32,13 +32,7 @@ public class RolesTest {
                         System.out.println("Fetched roles!");
                         System.out.println("");
                         for (Role role : roles) {
-                            System.out.println("Name: "+role.getName());
-                            System.out.println("School: "+role.getSchool());
-                            System.out.println("Slug Id: "+role.getSlug());
-                            System.out.println("Id: "+role.getId());
-                            System.out.println("Type: "+role.getType());
-                            System.out.println("Class: "+new Gson().toJson(role.getClassName()));
-                            System.out.println("Class director: "+new Gson().toJson(role.getClassTeacher()));
+                            System.out.println(new Gson().toJson(role));
                             System.out.println("----------");
 
                         }

@@ -1,3 +1,4 @@
+import com.google.gson.Gson;
 import org.junit.Test;
 import org.openwilma.java.OpenWilma;
 import org.openwilma.java.classes.Authentication;
@@ -18,6 +19,11 @@ public class LoginTest {
             public void onLogin(Authentication wilmaSession) {
                 System.out.println("Login successful");
                 System.out.println("SessionId: "+wilmaSession.getSessionId());
+                // Outputting user details
+                System.out.println("-----");
+                System.out.println(new Gson().toJson(wilmaSession.getUser()));
+                System.out.println("-----");
+                System.out.println("ROLE REQUIRED TO SELECT: "+(wilmaSession.isRequiresRole() ? "yes" : "no"));
             }
 
             @Override

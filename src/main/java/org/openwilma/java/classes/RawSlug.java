@@ -1,5 +1,7 @@
 package org.openwilma.java.classes;
 
+import org.openwilma.java.enums.UserType;
+
 public class RawSlug {
     private int id;
     private int type;
@@ -22,6 +24,8 @@ public class RawSlug {
     public int getType() {
         return type;
     }
+
+
 
     public void setType(int type) {
         this.type = type;

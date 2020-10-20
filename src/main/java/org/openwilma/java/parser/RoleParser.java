@@ -9,6 +9,7 @@ import org.openwilma.java.classes.RawSlug;
 import org.openwilma.java.classes.Role;
 import org.openwilma.java.classes.WilmaUserTypes;
 import org.openwilma.java.config.Config;
+import org.openwilma.java.enums.UserType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,12 +18,6 @@ import java.util.regex.Pattern;
 
 public class RoleParser {
 
-    private static Element getFirstOrNull(Elements elements) {
-        if (elements.isEmpty())
-            return null;
-        else
-            return elements.get(0);
-    }
 
     public static List<Role> parseRoles(String htmlContent) {
         List<Role> roles = new ArrayList<>();
@@ -40,7 +35,7 @@ public class RoleParser {
             Elements rolesPanel = selectionParent.getElementsByClass("panel");
             if (rolesPanel != null) {
                 for (Element rolePanel : rolesPanel) {
-                    Element panelBody = getFirstOrNull(rolePanel.getElementsByClass("panel-body"));
+                    Element panelBody = ParseUtils.getFirstOrNull(rolePanel.getElementsByClass("panel-body"));
                     if (panelBody != null) {
                         Elements roleLinks = rolePanel.getElementsByClass("text-style-link");
                         for (Element roleLink : roleLinks) {
@@ -49,7 +44,7 @@ public class RoleParser {
                             RawSlug slug = RoleSlugParser.parseSlug(roleLink.attr("href"));
 
                             // Removing school name from roleName
-                            Element schoolElement = getFirstOrNull(roleLink.getElementsByTag("small"));
+                            Element schoolElement = ParseUtils.getFirstOrNull(roleLink.getElementsByTag("small"));
                             String schoolName = null;
                             if (schoolElement != null) {
                                 schoolName = schoolElement.text();
@@ -59,7 +54,7 @@ public class RoleParser {
                             else
                                 roleName = roleName.trim();
 
-                            Element schoolClassElement = getFirstOrNull(roleLink.getElementsByClass("lem"));
+                            Element schoolClassElement = ParseUtils.getFirstOrNull(roleLink.getElementsByClass("lem"));
                             String schoolClassName = null;
                             if (schoolClassElement != null) {
                                 if (schoolClassElement.text().split(", ").length == 2)
@@ -70,7 +65,7 @@ public class RoleParser {
                             else
                                 roleName = roleName.trim();
 
-                            Element classTeacherElement = getFirstOrNull(panelBody.getElementsByClass("links small first bothmargins"));
+                            Element classTeacherElement = ParseUtils.getFirstOrNull(panelBody.getElementsByClass("links small first bothmargins"));
                             String classTeacherName = null;
                             if (classTeacherElement != null) {
                                 if (classTeacherElement.text().split(": ").length == 2)
@@ -80,7 +75,7 @@ public class RoleParser {
 
                             // If slug is null, don't add that role.
                             if (slug != null) {
-                                Role role = new Role(roleName, slug.getType(), slug.getId(), slug.getSlug(), classTeacherName, schoolClassName, schoolName);
+                                Role role = new Role(roleName, ParseUtils.getTypeAsEnum(slug.getType()), slug.getId(), slug.getSlug(), classTeacherName, schoolClassName, schoolName);
                                 roles.add(role);
                             }
                         }
